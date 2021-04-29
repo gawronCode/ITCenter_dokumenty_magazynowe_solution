@@ -12,6 +12,6 @@ namespace ITCenter_dokumenty_magazynowe.Repositories.IRepos
         Task<bool> Create(T entity);
         Task<bool> Update(T entity);
         Task<bool> Delete(T entity);
-        Task<bool> Save(T entity);
+        Task<bool> Save();
     }
 }

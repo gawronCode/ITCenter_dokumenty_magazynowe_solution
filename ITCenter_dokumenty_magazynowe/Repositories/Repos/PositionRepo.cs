@@ -29,7 +29,7 @@ namespace ITCenter_dokumenty_magazynowe.Repositories.Repos
             throw new NotImplementedException();
         }
 
-        public Task<bool> Save(Position entity)
+        public Task<bool> Save()
         {
             throw new NotImplementedException();
         }

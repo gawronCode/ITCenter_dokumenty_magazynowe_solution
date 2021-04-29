@@ -2,41 +2,55 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ITCenter_dokumenty_magazynowe.Data;
 using ITCenter_dokumenty_magazynowe.Models.DbModels;
 using ITCenter_dokumenty_magazynowe.Repositories.IRepos;
+using Microsoft.EntityFrameworkCore;
 
 namespace ITCenter_dokumenty_magazynowe.Repositories.Repos
 {
     public class WarehouseDocRepo : IWarehouseDocRepo
     {
-        public Task<bool> Create(WarehouseDoc entity)
+        private readonly ApplicationDbContext _context;
+        public WarehouseDocRepo(ApplicationDbContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public Task<bool> Delete(WarehouseDoc entity)
+        public async Task<bool> Create(WarehouseDoc entity)
         {
-            throw new NotImplementedException();
+            await _context.WarehouseDocs.AddAsync(entity);
+            return await Save();
         }
 
-        public Task<ICollection<WarehouseDoc>> GetAll()
+        public async Task<bool> Delete(WarehouseDoc entity)
         {
-            throw new NotImplementedException();
+            _context.WarehouseDocs.Remove(entity);
+            return await Save();
         }
 
-        public Task<WarehouseDoc> GetById(int id)
+        public async Task<ICollection<WarehouseDoc>> GetAll()
         {
-            throw new NotImplementedException();
+            var docs = await _context.WarehouseDocs.ToListAsync();
+            return docs;
         }
 
-        public Task<bool> Save(WarehouseDoc entity)
+        public async Task<WarehouseDoc> GetById(int id)
         {
-            throw new NotImplementedException();
+            var warehouseDoc = await _context.WarehouseDocs.FirstOrDefaultAsync(q => q.Id == id);
+            return warehouseDoc;
         }
 
-        public Task<bool> Update(WarehouseDoc entity)
+        public async Task<bool> Save()
         {
-            throw new NotImplementedException();
+            var changes = await _context.SaveChangesAsync();
+            return changes > 0;
+        }
+
+        public async Task<bool> Update(WarehouseDoc entity)
+        {
+            _context.Update(entity);
+            return await Save();
         }
     }
 }

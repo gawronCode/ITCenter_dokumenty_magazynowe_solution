@@ -40,6 +40,7 @@ namespace ITCenter_dokumenty_magazynowe
             services.AddScoped<IOperationLogRepo, OperationLogRepo>();
             services.AddScoped<IPositionRepo, PositionRepo>();
             services.AddScoped<IWarehouseDocRepo, WarehouseDocRepo>();
+            services.AddScoped<IEmployeeRepo, EmployeeRepo>();
 
             services.Configure<IdentityOptions>(options =>
             {

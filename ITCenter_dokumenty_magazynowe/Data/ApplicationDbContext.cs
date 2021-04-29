@@ -17,6 +17,7 @@ namespace ITCenter_dokumenty_magazynowe.Data
         public DbSet<OperationLog> OperationLogs { get; set; }
         public DbSet<Position> Positions { get; set; }
         public DbSet<WarehouseDoc> WarehouseDocs { get; set; }
+        public DbSet<Employee> Employees { get; set; }
 
     }
 }

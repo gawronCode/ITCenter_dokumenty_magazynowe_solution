@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using ITCenter_dokumenty_magazynowe.Models.DbModels;
 
 namespace ITCenter_dokumenty_magazynowe.Data
 {
@@ -12,5 +13,10 @@ namespace ITCenter_dokumenty_magazynowe.Data
             : base(options)
         {
         }
+
+        public DbSet<OperationLog> OperationLogs { get; set; }
+        public DbSet<Position> Positions { get; set; }
+        public DbSet<WarehouseDoc> WarehouseDocs { get; set; }
+
     }
 }

@@ -16,5 +16,7 @@ namespace ITCenter_dokumenty_magazynowe.Models.DbModels
         [Required]
         public string Info { get; set; }
 
+        public DateTime? Date { get; set; }
+
     }
 }

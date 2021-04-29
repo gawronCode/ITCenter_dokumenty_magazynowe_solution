@@ -6,14 +6,33 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using ITCenter_dokumenty_magazynowe.Repositories.IRepos;
+using Microsoft.AspNetCore.Identity;
 
 namespace ITCenter_dokumenty_magazynowe.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly IWarehouseDocRepo _warehouseDocRepo;
+        public HomeController(IWarehouseDocRepo warehouseDocRepo)
+        {
+            _warehouseDocRepo = warehouseDocRepo;
+
+        }
         
         public IActionResult Index()
+        {
+
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Documents");
+            }
+
+            return View();
+
+        }
+
+        public IActionResult Documents()
         {
             return View();
         }

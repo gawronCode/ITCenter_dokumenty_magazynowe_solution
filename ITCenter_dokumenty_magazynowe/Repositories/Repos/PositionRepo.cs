@@ -24,9 +24,10 @@ namespace ITCenter_dokumenty_magazynowe.Repositories.Repos
             throw new NotImplementedException();
         }
 
-        public Task<bool> Delete(Position entity)
+        public async Task<bool> Delete(Position entity)
         {
-            throw new NotImplementedException();
+            _context.Positions.Remove(entity);
+            return await Save();
         }
 
         public Task<ICollection<Position>> GetAll()
@@ -45,9 +46,16 @@ namespace ITCenter_dokumenty_magazynowe.Repositories.Repos
             throw new NotImplementedException();
         }
 
-        public Task<bool> Save()
+        public async Task<bool> RemoveByParentId(int parentId)
         {
-            throw new NotImplementedException();
+            _context.Positions.RemoveRange(_context.Positions.Where(q=>q.WarehouseDocId == parentId));
+            return await Save();
+        }
+
+        public async Task<bool> Save()
+        {
+            var changes = await _context.SaveChangesAsync();
+            return changes > 0;
         }
 
         public Task<bool> Update(Position entity)

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using ITCenter_dokumenty_magazynowe.Data;
 using ITCenter_dokumenty_magazynowe.Models.DbModels;
+using ITCenter_dokumenty_magazynowe.Repositories.IRepos;
 using Microsoft.AspNetCore.Authorization;
 
 namespace ITCenter_dokumenty_magazynowe.Controllers
@@ -21,9 +22,18 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
     public class WarehouseDocsController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public WarehouseDocsController(ApplicationDbContext context) {
+        private readonly IPositionRepo _positionRepo;
+        private readonly IWarehouseDocRepo _warehouseDocRepo;
+        private readonly IOperationLogRepo _operationLogRepo;
+        public WarehouseDocsController(ApplicationDbContext context,
+            IPositionRepo positionRepo,
+            IOperationLogRepo operationLogRepo,
+            IWarehouseDocRepo warehouseDocRepo)
+        {
             _context = context;
+            _operationLogRepo = operationLogRepo;
+            _warehouseDocRepo = warehouseDocRepo;
+            _positionRepo = positionRepo;
         }
 
         [HttpGet]
@@ -58,6 +68,13 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             var result = _context.WarehouseDocs.Add(model);
             await _context.SaveChangesAsync();
 
+            await _operationLogRepo.Create(new OperationLog
+            {
+                Date = model.Date,
+                Info = $"create;Doc;{model.Id};{model.Name};{model.ClientNumber};{model.NetPrice};{model.GrossPrice}",
+                ObjectId = model.Id,
+            });
+
             return Json(new { result.Entity.Id });
         }
 
@@ -74,14 +91,27 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
                 return BadRequest(GetFullErrorMessage(ModelState));
 
             await _context.SaveChangesAsync();
+
+            await _operationLogRepo.Create(new OperationLog
+            {
+                Date = model.Date,
+                Info = $"update;Doc;{model.Id};{model.Name};{model.ClientNumber};{model.NetPrice};{model.GrossPrice}",
+                ObjectId = model.Id,
+            });
+
             return Ok();
         }
 
         [HttpDelete]
         public async Task Delete(int key) {
             var model = await _context.WarehouseDocs.FirstOrDefaultAsync(item => item.Id == key);
-
             _context.WarehouseDocs.Remove(model);
+            await _operationLogRepo.Create(new OperationLog
+            {
+                Date = model.Date,
+                Info = $"delete;Doc;{model.Id};{model.Name};{model.ClientNumber};{model.NetPrice};{model.GrossPrice}",
+                ObjectId = model.Id,
+            });
             await _context.SaveChangesAsync();
         }
 

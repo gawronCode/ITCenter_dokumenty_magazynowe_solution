@@ -1,0 +1,23 @@
+﻿@page
+@model PersonalDataModel
+@{
+    ViewData["Title"] = "Personal Data";
+    ViewData["ActivePage"] = ManageNavPages.PersonalData;
+}
+
+<h4>Usuwanie konta</h4>
+
+<div class="row">
+    <div class="col-md-6">
+        <p>
+            <strong>Usunięcie konta wiąże się z nieodwracalną utratą danych</strong>
+        </p>
+        <p>
+            <a id="delete" asp-page="DeletePersonalData" class="btn btn-primary">Usuń</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -9,7 +9,7 @@ namespace ITCenter_dokumenty_magazynowe.Repositories.Repos
 {
     public class EmployeeRepo : IEmployeeRepo
     {
-        public Task<bool> Create(Employee entity)
+        public Task<Employee> Create(Employee entity)
         {
             throw new NotImplementedException();
         }
@@ -19,7 +19,7 @@ namespace ITCenter_dokumenty_magazynowe.Repositories.Repos
             throw new NotImplementedException();
         }
 
-        public Task<ICollection<Employee>> GetAll()
+        public IQueryable<Employee> GetAll()
         {
             throw new NotImplementedException();
         }

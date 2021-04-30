@@ -19,9 +19,11 @@ namespace ITCenter_dokumenty_magazynowe.Repositories.Repos
             _context = context;
         }
 
-        public Task<bool> Create(Position entity)
+        public async Task<Position> Create(Position entity)
         {
-            throw new NotImplementedException();
+            var result = await _context.Positions.AddAsync(entity);
+            await Save();
+            return result.Entity;
         }
 
         public async Task<bool> Delete(Position entity)
@@ -30,9 +32,10 @@ namespace ITCenter_dokumenty_magazynowe.Repositories.Repos
             return await Save();
         }
 
-        public Task<ICollection<Position>> GetAll()
+        public IQueryable<Position> GetAll()
         {
-            throw new NotImplementedException();
+            var positions = _context.Positions;
+            return positions;
         }
 
         public async Task<ICollection<Position>> GetAllByParentId(int parentId)
@@ -41,9 +44,10 @@ namespace ITCenter_dokumenty_magazynowe.Repositories.Repos
             return positions;
         }
 
-        public Task<Position> GetById(int id)
+        public async Task<Position> GetById(int id)
         {
-            throw new NotImplementedException();
+            var position = await _context.Positions.FirstOrDefaultAsync(q => q.Id == id);
+            return position;
         }
 
         public async Task<bool> RemoveByParentId(int parentId)

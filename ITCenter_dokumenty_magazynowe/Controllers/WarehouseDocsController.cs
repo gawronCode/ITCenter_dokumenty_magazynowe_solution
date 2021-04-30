@@ -2,15 +2,11 @@ using DevExtreme.AspNet.Data;
 using DevExtreme.AspNet.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using ITCenter_dokumenty_magazynowe.Data;
 using ITCenter_dokumenty_magazynowe.Models.DbModels;
 using ITCenter_dokumenty_magazynowe.Repositories.IRepos;
 using Microsoft.AspNetCore.Authorization;
@@ -21,24 +17,18 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
     [Authorize]
     public class WarehouseDocsController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IPositionRepo _positionRepo;
         private readonly IWarehouseDocRepo _warehouseDocRepo;
         private readonly IOperationLogRepo _operationLogRepo;
-        public WarehouseDocsController(ApplicationDbContext context,
-            IPositionRepo positionRepo,
-            IOperationLogRepo operationLogRepo,
+        public WarehouseDocsController(IOperationLogRepo operationLogRepo,
             IWarehouseDocRepo warehouseDocRepo)
         {
-            _context = context;
             _operationLogRepo = operationLogRepo;
             _warehouseDocRepo = warehouseDocRepo;
-            _positionRepo = positionRepo;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get(DataSourceLoadOptions loadOptions) {
-            var warehousedocs = _context.WarehouseDocs.Select(i => new {
+            var warehousedocs = _warehouseDocRepo.GetAll().Select(i => new {
                 i.Id,
                 i.Name,
                 i.ClientNumber,
@@ -46,13 +36,7 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
                 i.NetPrice,
                 i.GrossPrice
             });
-
-            // If you work with a large amount of data, consider specifying the PaginateViaPrimaryKey and PrimaryKey properties.
-            // In this case, keys and data are loaded in separate queries. This can make the SQL execution plan more efficient.
-            // Refer to the topic https://github.com/DevExpress/DevExtreme.AspNet.Data/issues/336.
-            // loadOptions.PrimaryKey = new[] { "Id" };
-            // loadOptions.PaginateViaPrimaryKey = true;
-
+            
             return Json(await DataSourceLoader.LoadAsync(warehousedocs, loadOptions));
         }
 
@@ -65,22 +49,15 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             if(!TryValidateModel(model))
                 return BadRequest(GetFullErrorMessage(ModelState));
 
-            var result = _context.WarehouseDocs.Add(model);
-            await _context.SaveChangesAsync();
+            var result = await _warehouseDocRepo.Create(model);
+            await LogDocData(model, "create");
 
-            await _operationLogRepo.Create(new OperationLog
-            {
-                Date = model.Date,
-                Info = $"create;Doc;{model.Id};{model.Name};{model.ClientNumber};{model.NetPrice};{model.GrossPrice}",
-                ObjectId = model.Id,
-            });
-
-            return Json(new { result.Entity.Id });
+            return Json(new { result.Id });
         }
 
         [HttpPut]
         public async Task<IActionResult> Put(int key, string values) {
-            var model = await _context.WarehouseDocs.FirstOrDefaultAsync(item => item.Id == key);
+            var model = await _warehouseDocRepo.GetById(key);
             if(model == null)
                 return StatusCode(409, "Object not found");
 
@@ -90,39 +67,39 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             if(!TryValidateModel(model))
                 return BadRequest(GetFullErrorMessage(ModelState));
 
-            await _context.SaveChangesAsync();
-
-            await _operationLogRepo.Create(new OperationLog
-            {
-                Date = model.Date,
-                Info = $"update;Doc;{model.Id};{model.Name};{model.ClientNumber};{model.NetPrice};{model.GrossPrice}",
-                ObjectId = model.Id,
-            });
+            await _warehouseDocRepo.Save();
+            await LogDocData(model, "update");
 
             return Ok();
         }
 
         [HttpDelete]
-        public async Task Delete(int key) {
-            var model = await _context.WarehouseDocs.FirstOrDefaultAsync(item => item.Id == key);
-            _context.WarehouseDocs.Remove(model);
+        public async Task Delete(int key)
+        {
+            var model = await _warehouseDocRepo.GetById(key);
+            await _warehouseDocRepo.Delete(model);
+            await LogDocData(model, "delete");
+        }
+
+        [NonAction]
+        private async Task LogDocData(WarehouseDoc model, string operation)
+        {
             await _operationLogRepo.Create(new OperationLog
             {
-                Date = model.Date,
-                Info = $"delete;Doc;{model.Id};{model.Name};{model.ClientNumber};{model.NetPrice};{model.GrossPrice}",
+                Date = DateTime.Now,
+                Info = $"{operation};Doc;{model.Id};{model.Name};{model.Date};{model.ClientNumber};{model.NetPrice};{model.GrossPrice}",
                 ObjectId = model.Id,
             });
-            await _context.SaveChangesAsync();
         }
 
 
         private void PopulateModel(WarehouseDoc model, IDictionary values) {
-            string ID = nameof(WarehouseDoc.Id);
-            string NAME = nameof(WarehouseDoc.Name);
-            string CLIENT_NUMBER = nameof(WarehouseDoc.ClientNumber);
-            string DATE = nameof(WarehouseDoc.Date);
-            string NET_PRICE = nameof(WarehouseDoc.NetPrice);
-            string GROSS_PRICE = nameof(WarehouseDoc.GrossPrice);
+            var ID = nameof(WarehouseDoc.Id);
+            var NAME = nameof(WarehouseDoc.Name);
+            var CLIENT_NUMBER = nameof(WarehouseDoc.ClientNumber);
+            var DATE = nameof(WarehouseDoc.Date);
+            var NET_PRICE = nameof(WarehouseDoc.NetPrice);
+            var GROSS_PRICE = nameof(WarehouseDoc.GrossPrice);
 
             if(values.Contains(ID)) {
                 model.Id = Convert.ToInt32(values[ID]);
@@ -149,15 +126,14 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             }
         }
 
-        private string GetFullErrorMessage(ModelStateDictionary modelState) {
-            var messages = new List<string>();
+        private static string GetFullErrorMessage(ModelStateDictionary modelState) {
+            var messages = (from entry 
+                in modelState from 
+                error in 
+                entry.Value.Errors 
+                select error.ErrorMessage).ToList();
 
-            foreach(var entry in modelState) {
-                foreach(var error in entry.Value.Errors)
-                    messages.Add(error.ErrorMessage);
-            }
-
-            return String.Join(" ", messages);
+            return string.Join(" ", messages);
         }
     }
 }

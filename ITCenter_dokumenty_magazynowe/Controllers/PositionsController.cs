@@ -22,26 +22,23 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
     [Authorize]
     public class PositionsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+
         private readonly IPositionRepo _positionRepo;
         private readonly IWarehouseDocRepo _warehouseDocRepo;
         private readonly IOperationLogRepo _operationLogRepo;
         
-        public PositionsController(ApplicationDbContext context,
-            IPositionRepo positionRepo,
+        public PositionsController(IPositionRepo positionRepo,
             IOperationLogRepo operationLogRepo,
             IWarehouseDocRepo warehouseDocRepo) {
-            _context = context;
             _operationLogRepo = operationLogRepo;
             _warehouseDocRepo = warehouseDocRepo;
             _positionRepo = positionRepo;
         }
-
-
+        
 
         [HttpGet]
         public async Task<IActionResult> Get(DataSourceLoadOptions loadOptions) {
-            var positions = _context.Positions.Select(i => new {
+            var positions = _positionRepo.GetAll().Select(i => new {
                 i.Id,
                 i.ProductName,
                 i.Quantity,
@@ -49,36 +46,29 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
                 i.GrossPrice,
                 i.WarehouseDocId
             });
-
-            // If you work with a large amount of data, consider specifying the PaginateViaPrimaryKey and PrimaryKey properties.
-            // In this case, keys and data are loaded in separate queries. This can make the SQL execution plan more efficient.
-            // Refer to the topic https://github.com/DevExpress/DevExtreme.AspNet.Data/issues/336.
-            // loadOptions.PrimaryKey = new[] { "Id" };
-            // loadOptions.PaginateViaPrimaryKey = true;
-
+            
             return Json(await DataSourceLoader.LoadAsync(positions, loadOptions));
         }
 
         [HttpPost]
         public async Task<IActionResult> Post(string values) {
-            var model = new Models.DbModels.Position();
+            var model = new Position();
             var valuesDict = JsonConvert.DeserializeObject<IDictionary>(values);
             PopulateModel(model, valuesDict);
 
             if(!TryValidateModel(model))
                 return BadRequest(GetFullErrorMessage(ModelState));
 
-            var result = _context.Positions.Add(model);
-            await _context.SaveChangesAsync();
+            var result = await _positionRepo.Create(model);
+            await LogPositionData(model, "create");
             await UpdateParent(model);
-            await _context.SaveChangesAsync();
 
-            return Json(new { result.Entity.Id });
+            return Json(new { result.Id });
         }
 
         [HttpPut]
         public async Task<IActionResult> Put(int key, string values) {
-            var model = await _context.Positions.FirstOrDefaultAsync(item => item.Id == key);
+            var model = await _positionRepo.GetById(key);
             if(model == null)
                 return StatusCode(409, "Object not found");
 
@@ -88,19 +78,19 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             if(!TryValidateModel(model))
                 return BadRequest(GetFullErrorMessage(ModelState));
 
-            await _context.SaveChangesAsync();
+            await LogPositionData(model, "update");
             await UpdateParent(model);
-            await _context.SaveChangesAsync();
+
             return Ok();
         }
 
         [HttpDelete]
-        public async Task Delete(int key) {
-            var model = await _context.Positions.FirstOrDefaultAsync(item => item.Id == key);
-
+        public async Task Delete(int key)
+        {
+            var model = await _positionRepo.GetById(key);
+            await LogPositionData(model, "delete");
             await UpdateParent(model);
-            _context.Positions.Remove(model);
-            await _context.SaveChangesAsync();
+            await _positionRepo.Delete(model);
         }
 
         [NonAction]
@@ -113,11 +103,34 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             var newGrossPrice = parentPositions.Sum(q => q.GrossPrice * q.Quantity);
             parentModel.NetPrice = newNetPrice;
             parentModel.GrossPrice = newGrossPrice;
+            await LogDocData(parentModel, "update");
+        }
+
+        [NonAction]
+        private async Task LogDocData(WarehouseDoc model, string operation)
+        {
+            await _operationLogRepo.Create(new OperationLog
+            {
+                Date = model.Date,
+                Info = $"{operation};Doc;{model.Id};{model.Name};{model.ClientNumber};{model.NetPrice};{model.GrossPrice}",
+                ObjectId = model.Id,
+            });
+        }
+
+        [NonAction]
+        private async Task LogPositionData(Position model, string operation)
+        {
+            await _operationLogRepo.Create(new OperationLog
+            {
+                Date = DateTime.Now,
+                Info = $"{operation};Position;{model.Id};{model.ProductName};{model.Quantity};{model.NetPrice};{model.GrossPrice};{model.WarehouseDocId}",
+                ObjectId = model.Id,
+            });
         }
 
         [HttpGet]
         public async Task<IActionResult> WarehouseDocsLookup(DataSourceLoadOptions loadOptions) {
-            var lookup = from i in _context.WarehouseDocs
+            var lookup = from i in _warehouseDocRepo.GetAll()
                          orderby i.Name
                          select new {
                              Value = i.Id,
@@ -126,12 +139,12 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             return Json(await DataSourceLoader.LoadAsync(lookup, loadOptions));
         }
 
-        private void PopulateModel(Models.DbModels.Position model, IDictionary values) {
-            string ID = nameof(Models.DbModels.Position.Id);
-            string PRODUCT_NAME = nameof(Models.DbModels.Position.ProductName);
-            string QUANTITY = nameof(Models.DbModels.Position.Quantity);
-            string NET_PRICE = nameof(Models.DbModels.Position.NetPrice);
-            string WAREHOUSE_DOC_ID = nameof(Models.DbModels.Position.WarehouseDocId);
+        private static void PopulateModel(Position model, IDictionary values) {
+            var ID = nameof(Position.Id);
+            var PRODUCT_NAME = nameof(Position.ProductName);
+            var QUANTITY = nameof(Position.Quantity);
+            var NET_PRICE = nameof(Position.NetPrice);
+            var WAREHOUSE_DOC_ID = nameof(Position.WarehouseDocId);
 
             if(values.Contains(ID)) {
                 model.Id = Convert.ToInt32(values[ID]);
@@ -155,13 +168,11 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             }
         }
 
-        private string GetFullErrorMessage(ModelStateDictionary modelState) {
-            var messages = new List<string>();
-
-            foreach(var entry in modelState) {
-                foreach(var error in entry.Value.Errors)
-                    messages.Add(error.ErrorMessage);
-            }
+        private static string GetFullErrorMessage(ModelStateDictionary modelState) {
+            var messages = (from entry 
+                in modelState 
+                from error in entry.Value.Errors 
+                select error.ErrorMessage).ToList();
 
             return String.Join(" ", messages);
         }

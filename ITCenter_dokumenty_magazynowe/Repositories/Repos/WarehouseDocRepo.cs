@@ -17,10 +17,11 @@ namespace ITCenter_dokumenty_magazynowe.Repositories.Repos
             _context = context;
         }
 
-        public async Task<bool> Create(WarehouseDoc entity)
+        public async Task<WarehouseDoc> Create(WarehouseDoc entity)
         {
-            await _context.WarehouseDocs.AddAsync(entity);
-            return await Save();
+            var result = await _context.WarehouseDocs.AddAsync(entity);
+            await Save();
+            return result.Entity;
         }
 
         public async Task<bool> Delete(WarehouseDoc entity)
@@ -29,9 +30,9 @@ namespace ITCenter_dokumenty_magazynowe.Repositories.Repos
             return await Save();
         }
 
-        public async Task<ICollection<WarehouseDoc>> GetAll()
+        public IQueryable<WarehouseDoc> GetAll()
         {
-            var docs = await _context.WarehouseDocs.ToListAsync();
+            var docs =  _context.WarehouseDocs;
             return docs;
         }
 

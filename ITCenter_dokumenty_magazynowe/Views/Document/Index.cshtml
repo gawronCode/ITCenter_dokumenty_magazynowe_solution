@@ -26,8 +26,11 @@
         pager.Visible(true);
     })
     .RemoteOperations(true)
-    .Columns(columns => {
-        
+    .Columns(columns =>
+    {
+
+        columns.AddFor(m => m.Id).Caption("Id dokumentu").AllowEditing(false);
+
         columns.AddFor(m => m.Name).Caption("Nazwa");
 
         columns.AddFor(m => m.ClientNumber).Caption("Numer klienta");

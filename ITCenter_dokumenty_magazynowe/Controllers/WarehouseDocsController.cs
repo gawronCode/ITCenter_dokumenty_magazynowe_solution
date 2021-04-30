@@ -12,13 +12,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using ITCenter_dokumenty_magazynowe.Data;
 using ITCenter_dokumenty_magazynowe.Models.DbModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ITCenter_dokumenty_magazynowe.Controllers
 {
     [Route("api/[controller]/[action]")]
+    [Authorize]
     public class WarehouseDocsController : Controller
     {
-        private ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         public WarehouseDocsController(ApplicationDbContext context) {
             _context = context;

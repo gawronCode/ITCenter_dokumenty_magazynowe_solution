@@ -12,16 +12,28 @@ using System.Linq;
 using System.Threading.Tasks;
 using ITCenter_dokumenty_magazynowe.Data;
 using ITCenter_dokumenty_magazynowe.Models.DbModels;
+using ITCenter_dokumenty_magazynowe.Repositories.IRepos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ITCenter_dokumenty_magazynowe.Controllers
 {
     [Route("api/[controller]/[action]")]
+    [Authorize]
     public class PositionsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IPositionRepo _positionRepo;
+        private readonly IWarehouseDocRepo _warehouseDocRepo;
+        private readonly IOperationLogRepo _operationLogRepo;
         
-        public PositionsController(ApplicationDbContext context) {
+        public PositionsController(ApplicationDbContext context,
+            IPositionRepo positionRepo,
+            IOperationLogRepo operationLogRepo,
+            IWarehouseDocRepo warehouseDocRepo) {
             _context = context;
+            _operationLogRepo = operationLogRepo;
+            _warehouseDocRepo = warehouseDocRepo;
+            _positionRepo = positionRepo;
         }
 
 
@@ -57,6 +69,14 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
 
             var result = _context.Positions.Add(model);
             await _context.SaveChangesAsync();
+            var parentId = model.WarehouseDocId;
+            var parentModel = await _warehouseDocRepo.GetById(parentId);
+            var parentPositions = await _positionRepo.GetAllByParentId(parentId);
+            var newNetPrice = parentPositions.Sum(q => q.NetPrice * q.Quantity);
+            var newGrossPrice = parentPositions.Sum(q => q.GrossPrice * q.Quantity);
+            parentModel.NetPrice = newNetPrice;
+            parentModel.GrossPrice = newGrossPrice;
+            await _context.SaveChangesAsync();
 
             return Json(new { result.Entity.Id });
         }
@@ -74,14 +94,29 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
                 return BadRequest(GetFullErrorMessage(ModelState));
 
             await _context.SaveChangesAsync();
+            var parentId = model.WarehouseDocId;
+            var parentModel = await _warehouseDocRepo.GetById(parentId);
+            var parentPositions = await _positionRepo.GetAllByParentId(parentId);
+            var newNetPrice = parentPositions.Sum(q => q.NetPrice * q.Quantity);
+            var newGrossPrice = parentPositions.Sum(q => q.GrossPrice * q.Quantity);
+            parentModel.NetPrice = newNetPrice;
+            parentModel.GrossPrice = newGrossPrice;
+            await _context.SaveChangesAsync();
             return Ok();
         }
 
         [HttpDelete]
         public async Task Delete(int key) {
             var model = await _context.Positions.FirstOrDefaultAsync(item => item.Id == key);
-
+            var parentId = model.WarehouseDocId;
             _context.Positions.Remove(model);
+            await _context.SaveChangesAsync();
+            var parentModel = await _warehouseDocRepo.GetById(parentId);
+            var parentPositions = await _positionRepo.GetAllByParentId(parentId);
+            var newNetPrice = parentPositions.Sum(q => q.NetPrice * q.Quantity);
+            var newGrossPrice = parentPositions.Sum(q => q.GrossPrice * q.Quantity);
+            parentModel.NetPrice = newNetPrice;
+            parentModel.GrossPrice = newGrossPrice;
             await _context.SaveChangesAsync();
         }
 

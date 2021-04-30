@@ -8,5 +8,6 @@ namespace ITCenter_dokumenty_magazynowe.Repositories.IRepos
 {
     public interface IPositionRepo : IGeneralRepo<Position>
     {
+        public Task<ICollection<Position>> GetAllByParentId(int parentId);
     }
 }

@@ -15,28 +15,36 @@
         .DeleteAction("Delete")
         .Key("Id")
     )
+    .Paging(paging => paging.PageSize(10))
+    .Pager(pager =>
+    {
+        pager.ShowPageSizeSelector(true);
+        pager.AllowedPageSizes(new[] {5, 10, 20});
+        pager.ShowInfo(true);
+        pager.Visible(true);
+    })
     .RemoteOperations(true)
     .Columns(columns =>
     {
 
         columns.AddFor(m => m.ProductName).Caption("Nazwa produktu");
 
-        columns.AddFor(m => m.Quantity);
+        columns.AddFor(m => m.Quantity).Caption("Ilość");
 
-        columns.AddFor(m => m.NetPrice);
+        columns.AddFor(m => m.NetPrice).Caption("Cena netto");
 
-        columns.AddFor(m => m.GrossPrice).AllowEditing(false);
+        columns.AddFor(m => m.GrossPrice).AllowEditing(false).Caption("Cena brutto");
 
         columns.AddFor(m => m.WarehouseDocId).Lookup(lookup => lookup
             .DataSource(ds => ds.WebApi().Controller("Positions").LoadAction("WarehouseDocsLookup").Key("Value"))
             .ValueExpr("Value")
             .DisplayExpr("Text")
-        );
+        ).Caption("Numer dokumentu");
     })
     .Editing(e => e
         .AllowAdding(true)
         .AllowUpdating(true)
         .AllowDeleting(true)
-    )
+    ).FilterRow(filterRow => filterRow.Visible(true))
     )
 

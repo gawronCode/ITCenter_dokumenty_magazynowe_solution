@@ -17,25 +17,31 @@
         .DeleteAction("Delete")
         .Key("Id")
     )
+    .Paging(paging => paging.PageSize(10))
+    .Pager(pager =>
+    {
+        pager.ShowPageSizeSelector(true);
+        pager.AllowedPageSizes(new[] {5, 10, 20});
+        pager.ShowInfo(true);
+        pager.Visible(true);
+    })
     .RemoteOperations(true)
     .Columns(columns => {
         
-        columns.AddFor(m => m.Name);
+        columns.AddFor(m => m.Name).Caption("Nazwa");
 
-        columns.AddFor(m => m.ClientNumber);
+        columns.AddFor(m => m.ClientNumber).Caption("Numer klienta");
 
-        columns.AddFor(m => m.Date);
+        columns.AddFor(m => m.Date).Caption("Data utworzenia");
 
-        columns.AddFor(m => m.NetPrice).AllowEditing(false);
+        columns.AddFor(m => m.NetPrice).AllowEditing(false).Caption("Cena netto");
 
-        columns.AddFor(m => m.GrossPrice).AllowEditing(false);
+        columns.AddFor(m => m.GrossPrice).AllowEditing(false).Caption("Cena brutto");
 
     })
     .Editing(e => e
         .AllowAdding(true)
         .AllowUpdating(true)
         .AllowDeleting(true)
-        )
+        ).FilterRow(filterRow => filterRow.Visible(true))
     )
-
-  <a class="nav-link text-dark" asp-area="" asp-controller="GitHub" asp-action="Index">GitHub Info</a>

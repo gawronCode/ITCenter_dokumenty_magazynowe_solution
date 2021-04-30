@@ -34,7 +34,7 @@ namespace ITCenter_dokumenty_magazynowe
                     Configuration.GetConnectionString("DbConnectionString")));
             services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
             services.AddRazorPages().AddRazorRuntimeCompilation();
 
             services.AddScoped<IOperationLogRepo, OperationLogRepo>();

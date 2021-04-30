@@ -13,32 +13,18 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
     {
 
         private readonly IWarehouseDocRepo _warehouseDocRepo;
-        public DocumentController(IWarehouseDocRepo warehouseDocRepo)
+        private readonly IOperationLogRepo _operationLogRepo;
+        public DocumentController(IWarehouseDocRepo warehouseDocRepo, IOperationLogRepo operationLogRepo)
         {
             _warehouseDocRepo = warehouseDocRepo;
-
+            _operationLogRepo = operationLogRepo;
         }
 
         public IActionResult Index()
         {
             return View();
         }
-
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        public IActionResult Delete()
-        {
-            return View();
-        }
-
-        public IActionResult Update()
-        {
-            return View();
-        }
-
+        
 
     }
 }

@@ -1,0 +1,3 @@
+﻿@using ITCenter_dokumenty_magazynowe
+@using ITCenter_dokumenty_magazynowe.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

@@ -1,7 +1,41 @@
-﻿@{
+﻿@using ITCenter_dokumenty_magazynowe.Models.DbModels
+
+@{
     ViewData["Title"] = "Dokumenty";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Lista dostępnych dokumentów:</h1>
+    <h1 class="display-4">Spis dokumentów magazynowych</h1>
 </div>
+
+@(Html.DevExtreme().DataGrid<ITCenter_dokumenty_magazynowe.Models.DbModels.WarehouseDoc>()
+    .DataSource(ds => ds.Mvc()
+        .Controller("WarehouseDocs")
+        .LoadAction("Get")
+        .InsertAction("Post")
+        .UpdateAction("Put")
+        .DeleteAction("Delete")
+        .Key("Id")
+    )
+    .RemoteOperations(true)
+    .Columns(columns => {
+        
+        columns.AddFor(m => m.Name);
+
+        columns.AddFor(m => m.ClientNumber);
+
+        columns.AddFor(m => m.Date);
+
+        columns.AddFor(m => m.NetPrice).AllowEditing(false);
+
+        columns.AddFor(m => m.GrossPrice).AllowEditing(false);
+
+    })
+    .Editing(e => e
+        .AllowAdding(true)
+        .AllowUpdating(true)
+        .AllowDeleting(true)
+        )
+    )
+
+  <a class="nav-link text-dark" asp-area="" asp-controller="GitHub" asp-action="Index">GitHub Info</a>

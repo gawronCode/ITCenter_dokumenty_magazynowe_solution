@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using ITCenter_dokumenty_magazynowe.Data;
 using ITCenter_dokumenty_magazynowe.Models.DbModels;

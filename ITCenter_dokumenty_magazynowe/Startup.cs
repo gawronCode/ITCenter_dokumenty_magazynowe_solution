@@ -1,17 +1,11 @@
 using ITCenter_dokumenty_magazynowe.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using ITCenter_dokumenty_magazynowe.Repositories.IRepos;
 using ITCenter_dokumenty_magazynowe.Repositories.Repos;
 
@@ -40,7 +34,6 @@ namespace ITCenter_dokumenty_magazynowe
             services.AddScoped<IOperationLogRepo, OperationLogRepo>();
             services.AddScoped<IPositionRepo, PositionRepo>();
             services.AddScoped<IWarehouseDocRepo, WarehouseDocRepo>();
-            services.AddScoped<IEmployeeRepo, EmployeeRepo>();
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -60,7 +53,7 @@ namespace ITCenter_dokumenty_magazynowe
             {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
+                app.UseDeveloperExceptionPage();
             }
             else
             {

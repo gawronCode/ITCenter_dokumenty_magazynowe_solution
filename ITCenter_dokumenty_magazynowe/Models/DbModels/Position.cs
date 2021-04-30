@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+
 
 namespace ITCenter_dokumenty_magazynowe.Models.DbModels
 {
@@ -16,9 +13,9 @@ namespace ITCenter_dokumenty_magazynowe.Models.DbModels
         [Required]
         public int Quantity { get; set; }
         [Required]
-        public int NetPrice { get; set; }
+        public double NetPrice { get; set; }
         [Required]
-        public int GrossPrice { get; set; }
+        public double GrossPrice { get; set; }
         [Required]
         public int WarehouseDocId { get; set; }
         public WarehouseDoc WarehouseDoc { get; set; }

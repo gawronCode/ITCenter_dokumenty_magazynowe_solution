@@ -155,8 +155,8 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             }
 
             if(values.Contains(NET_PRICE)) {
-                model.NetPrice = Convert.ToInt32(values[NET_PRICE]);
-                model.GrossPrice = (model.NetPrice * 121)/100;
+                model.NetPrice = Convert.ToDouble(values[NET_PRICE]);
+                model.GrossPrice = model.NetPrice * 1.21;
             }
             
             if(values.Contains(WAREHOUSE_DOC_ID)) {

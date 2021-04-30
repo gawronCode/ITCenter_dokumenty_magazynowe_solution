@@ -1,14 +1,7 @@
 ﻿using ITCenter_dokumenty_magazynowe.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using ITCenter_dokumenty_magazynowe.Repositories.IRepos;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+
 
 namespace ITCenter_dokumenty_magazynowe.Controllers
 {

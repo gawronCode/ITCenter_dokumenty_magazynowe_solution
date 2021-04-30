@@ -48,7 +48,8 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             var model = new WarehouseDoc();
             var valuesDict = JsonConvert.DeserializeObject<IDictionary>(values);
             PopulateModel(model, valuesDict);
-
+            model.NetPrice = 0.0;
+            model.GrossPrice = 0.0;
             if(!TryValidateModel(model))
                 return BadRequest(GetFullErrorMessage(ModelState));
 
@@ -137,11 +138,11 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             }
 
             if(values.Contains(NET_PRICE)) {
-                model.NetPrice = Convert.ToInt32(values[NET_PRICE]);
+                model.NetPrice = Convert.ToDouble(values[NET_PRICE]);
             }
 
             if(values.Contains(GROSS_PRICE)) {
-                model.GrossPrice = Convert.ToInt32(values[GROSS_PRICE]);
+                model.GrossPrice = Convert.ToDouble(values[GROSS_PRICE]);
             }
         }
 

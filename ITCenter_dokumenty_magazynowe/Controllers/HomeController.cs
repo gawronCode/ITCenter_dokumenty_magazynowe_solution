@@ -14,13 +14,7 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IWarehouseDocRepo _warehouseDocRepo;
-        public HomeController(IWarehouseDocRepo warehouseDocRepo)
-        {
-            _warehouseDocRepo = warehouseDocRepo;
 
-        }
-        
         public IActionResult Index()
         {
 

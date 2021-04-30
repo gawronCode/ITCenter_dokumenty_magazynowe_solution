@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using ITCenter_dokumenty_magazynowe.Repositories.IRepos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
 namespace ITCenter_dokumenty_magazynowe.Controllers
@@ -25,16 +26,11 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Documents");
+                return RedirectToAction("index", "Document");
             }
 
             return View();
 
-        }
-
-        public IActionResult Documents()
-        {
-            return View();
         }
         
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

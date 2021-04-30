@@ -16,14 +16,14 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
 {
     [Route("api/[controller]/[action]")]
     [Authorize]
-    public class PositionsController : Controller
+    public class API_PositionController : Controller
     {
 
         private readonly IPositionRepo _positionRepo;
         private readonly IWarehouseDocRepo _warehouseDocRepo;
         private readonly IOperationLogRepo _operationLogRepo;
         
-        public PositionsController(IPositionRepo positionRepo,
+        public API_PositionController(IPositionRepo positionRepo,
             IOperationLogRepo operationLogRepo,
             IWarehouseDocRepo warehouseDocRepo) {
             _operationLogRepo = operationLogRepo;

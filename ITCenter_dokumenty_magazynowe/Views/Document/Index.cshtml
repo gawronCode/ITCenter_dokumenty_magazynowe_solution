@@ -10,7 +10,7 @@
 
 @(Html.DevExtreme().DataGrid<ITCenter_dokumenty_magazynowe.Models.DbModels.WarehouseDoc>()
     .DataSource(ds => ds.Mvc()
-        .Controller("WarehouseDocs")
+        .Controller("API_Document")
         .LoadAction("Get")
         .InsertAction("Post")
         .UpdateAction("Put")

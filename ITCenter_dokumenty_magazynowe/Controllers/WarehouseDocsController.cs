@@ -19,11 +19,14 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
     {
         private readonly IWarehouseDocRepo _warehouseDocRepo;
         private readonly IOperationLogRepo _operationLogRepo;
+        private readonly IPositionRepo _positionRepo;
         public WarehouseDocsController(IOperationLogRepo operationLogRepo,
-            IWarehouseDocRepo warehouseDocRepo)
+            IWarehouseDocRepo warehouseDocRepo,
+            IPositionRepo positionRepo)
         {
             _operationLogRepo = operationLogRepo;
             _warehouseDocRepo = warehouseDocRepo;
+            _positionRepo = positionRepo;
         }
 
         [HttpGet]
@@ -77,6 +80,11 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
         public async Task Delete(int key)
         {
             var model = await _warehouseDocRepo.GetById(key);
+            var modelChildren = await _positionRepo.GetAllByParentId(model.Id);
+            foreach (var child in modelChildren)
+            {
+                await LogPositionData(child, "delete");
+            }
             await _warehouseDocRepo.Delete(model);
             await LogDocData(model, "delete");
         }
@@ -88,6 +96,17 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             {
                 Date = DateTime.Now,
                 Info = $"{operation};Doc;{model.Id};{model.Name};{model.Date};{model.ClientNumber};{model.NetPrice};{model.GrossPrice}",
+                ObjectId = model.Id,
+            });
+        }
+
+        [NonAction]
+        private async Task LogPositionData(Models.DbModels.Position model, string operation)
+        {
+            await _operationLogRepo.Create(new OperationLog
+            {
+                Date = DateTime.Now,
+                Info = $"{operation};Position;{model.Id};{model.ProductName};{model.Quantity};{model.NetPrice};{model.GrossPrice};{model.WarehouseDocId}",
                 ObjectId = model.Id,
             });
         }

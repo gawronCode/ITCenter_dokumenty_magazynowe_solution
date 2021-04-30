@@ -2,15 +2,11 @@
 using DevExtreme.AspNet.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using ITCenter_dokumenty_magazynowe.Data;
 using ITCenter_dokumenty_magazynowe.Models.DbModels;
 using ITCenter_dokumenty_magazynowe.Repositories.IRepos;
 using Microsoft.AspNetCore.Authorization;
@@ -111,7 +107,7 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
         {
             await _operationLogRepo.Create(new OperationLog
             {
-                Date = model.Date,
+                Date = DateTime.Now,
                 Info = $"{operation};Doc;{model.Id};{model.Name};{model.ClientNumber};{model.NetPrice};{model.GrossPrice}",
                 ObjectId = model.Id,
             });
@@ -174,7 +170,7 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
                 from error in entry.Value.Errors 
                 select error.ErrorMessage).ToList();
 
-            return String.Join(" ", messages);
+            return string.Join(" ", messages);
         }
     }
 }

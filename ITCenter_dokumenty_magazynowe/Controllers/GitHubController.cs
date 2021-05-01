@@ -13,7 +13,6 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
         public async Task<IActionResult> Index()
         {
             
-
             var httpClient = new HttpClient();
 
             var request = new HttpRequestMessage(HttpMethod.Get,

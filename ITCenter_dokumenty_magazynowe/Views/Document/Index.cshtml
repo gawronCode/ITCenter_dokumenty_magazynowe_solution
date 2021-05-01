@@ -35,7 +35,7 @@
 
         columns.AddFor(m => m.ClientNumber).Caption("Numer klienta");
 
-        columns.AddFor(m => m.Date).Caption("Data utworzenia");
+        columns.AddFor(m => m.Date).Caption("Data utworzenia").DataType(GridColumnDataType.DateTime).Format("dd.MM.yyyy HH:mm");
 
         columns.AddFor(m => m.NetPrice).AllowEditing(false).Caption("Cena netto");
 

@@ -108,7 +108,7 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             await _operationLogRepo.Create(new OperationLog
             {
                 Date = DateTime.Now,
-                Info = $"{operation};Doc;{model.Id};{model.Name};{model.ClientNumber};{model.NetPrice};{model.GrossPrice}",
+                Info = $"{operation};Doc;{model.Id};{model.Name};{model.Date};{model.ClientNumber};{model.NetPrice};{model.GrossPrice}",
                 ObjectId = model.Id,
             });
         }

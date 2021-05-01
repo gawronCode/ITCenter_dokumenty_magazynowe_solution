@@ -137,10 +137,12 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
 
             if(values.Contains(NET_PRICE)) {
                 model.NetPrice = Convert.ToDouble(values[NET_PRICE]);
+                model.NetPrice = Math.Round(model.NetPrice, 2);
             }
 
             if(values.Contains(GROSS_PRICE)) {
                 model.GrossPrice = Convert.ToDouble(values[GROSS_PRICE]);
+                model.GrossPrice = Math.Round(model.GrossPrice, 2);
             }
         }
 

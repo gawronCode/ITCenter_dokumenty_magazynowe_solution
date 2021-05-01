@@ -156,7 +156,9 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
 
             if(values.Contains(NET_PRICE)) {
                 model.NetPrice = Convert.ToDouble(values[NET_PRICE]);
+                model.NetPrice = Math.Round(model.NetPrice, 2);
                 model.GrossPrice = model.NetPrice * 1.21;
+                model.GrossPrice = Math.Round(model.GrossPrice, 2);
             }
             
             if(values.Contains(WAREHOUSE_DOC_ID)) {

@@ -1,7 +1,22 @@
-﻿@{
+﻿@model ITCenter_dokumenty_magazynowe.Models.ApiModel.GitHubRepoData
+
+@{
     ViewData["Title"] = "GitHubInfo";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Info z api githuba //TODO// :)</h1>
+    <h1 class="display-4">Info z api githuba</h1>
 </div>
+<div class="text-body" style="padding-top: 30px">
+    <p>Id projektu: @Model.Id</p>
+    <p>Nazwa projektu: @Model.Name</p>
+    <p>Opis projektu: @Model.Description</p>
+    <p>Data utworzenia: @Model.CreationDate</p>
+    <p>Właściciel: @Model.OwnerName</p>
+    <p>Liczba subkrybentów: @Model.SubscribersCount</p>
+    <div>
+        <a asp-area="" asp-controller="GitHub" asp-action="Index" class="btn btn-dark" style="margin-top: 20px; width: 120px">Odśwież</a>
+    </div>
+</div>
+
+

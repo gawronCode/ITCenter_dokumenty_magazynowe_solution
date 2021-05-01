@@ -48,8 +48,6 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
             var model = new WarehouseDoc();
             var valuesDict = JsonConvert.DeserializeObject<IDictionary>(values);
             PopulateModel(model, valuesDict);
-            model.NetPrice = 0.0;
-            model.GrossPrice = 0.0;
             if(!TryValidateModel(model))
                 return BadRequest(GetFullErrorMessage(ModelState));
 

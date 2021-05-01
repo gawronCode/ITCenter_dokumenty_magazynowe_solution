@@ -29,11 +29,14 @@
                     <ul class="navbar-nav flex-grow-1">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Spis dokumentów</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Position" asp-action="Index">Spis pozycji</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Dokumenty
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item text-dark" asp-controller="Document" asp-action="Index">Spis dokumentów</a>
+                                    <a class="dropdown-item text-dark" asp-controller="Position" asp-action="Index">Spis pozycji</a>
+                                </div>
                             </li>
                         }
                         else

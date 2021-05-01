@@ -85,8 +85,8 @@ namespace ITCenter_dokumenty_magazynowe.Controllers
         {
             var model = await _positionRepo.GetById(key);
             await LogPositionData(model, "delete");
-            await UpdateParent(model);
             await _positionRepo.Delete(model);
+            await UpdateParent(model);
         }
 
         [NonAction]
